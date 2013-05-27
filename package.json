@@ -1,10 +1,15 @@
 {
-    "engines": {
-        "node": "0.10.8",
-        "npm": "1.2.21"
-    },
     "dependencies": {
         "express": "3.2.5",
         "socket.io": "0.9.14"
+    },
+    "name": "websocket-relay",
+    "subdomain": "pnu-websocket-relay",
+    "scripts": {
+        "start": "node app.js"
+    },
+    "version": "0.0.1",
+    "engines": {
+        "node": "0.8.x"
     }
 }
