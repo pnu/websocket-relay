@@ -2,6 +2,13 @@ var app = require('express')()
   , server = require('http').createServer(app)
   , io = require('socket.io').listen(server);
 
+if ( process.env.FORCE_XHR ) {
+    io.configure(function () {
+        io.set("transports", ["xhr-polling"]);
+        io.set("polling duration", 10);
+    });
+}
+
 server.listen(process.env.PORT || 5000);
 
 app.get('/', function (req, res) {
