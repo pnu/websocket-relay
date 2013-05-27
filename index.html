@@ -1,0 +1,75 @@
+<style>
+#canvas { border-style: dotted; }
+</style>
+
+<p>
+    transmit channel <input id="transmit-channel" type="text"/>
+</p>
+
+<p>
+    <canvas id="canvas" width="640" height="480"/>
+</p>
+
+<p>
+    receive channel <input id="receive-channel" type="text"/>
+    <input id="subscribe" type="button" value="subscribe"/>
+</p>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+var socket = io.connect('http://localhost');
+
+var findPos = function(obj) {
+    var curleft = 0, curtop = 0;
+    if (obj.offsetParent) {
+        do {
+            curleft += obj.offsetLeft;
+            curtop += obj.offsetTop;
+        } while (obj = obj.offsetParent);
+        return { x: curleft, y: curtop };
+    }
+    return undefined;
+};
+
+$('#canvas').mousemove( function(e) {
+    var pos = findPos(this);
+    var x = e.pageX - pos.x;
+    var y = e.pageY - pos.y;
+    var ch = $('#transmit-channel').val();
+    if (!ch) return;
+    socket.emit('send', {
+        channel: ch,
+        message: {
+            x: x,
+            y: y
+        }
+    });
+    draw(this,x,y,10,'red');
+});
+
+var draw = function(canvas,centerX,centerY,radius,color) {
+      var context = canvas.getContext('2d');
+      context.beginPath();
+      context.arc(centerX, centerY, radius||10, 0, 2 * Math.PI, false);
+      context.fillStyle = color || 'green';
+      context.fill();
+      context.lineWidth = 3;
+      context.strokeStyle = '#003300';
+      context.stroke();
+};
+
+socket.on('message', function (data) {
+    var canvas = $('#canvas')[0];
+    var x = data.message.x;
+    var y = data.message.y;
+    draw(canvas,x,y,5,'green');
+});
+
+$('#subscribe').click(function() {
+    var ch = $('#receive-channel').val();
+    socket.emit('subscribe', ch);
+});
+
+</script>
