@@ -1,165 +1,43 @@
-<style>
-#canvas { border-style: dotted; }
-</style>
-
-<p>
-<select id="color" type="dropdown">
-<option value="">--select color--</option>
-<option value="aqua">aqua</option>
-<option value="black">black</option>
-<option value="blue">blue</option>
-<option value="fuchsia">fuchsia</option>
-<option value="gray">gray</option>
-<option value="green">green</option>
-<option value="lime">lime</option>
-<option value="maroon">maroon</option>
-<option value="navy">navy</option>
-<option value="olive">olive</option>
-<option value="orange">orange</option>
-<option value="purple">purple</option>
-<option value="red">red</option>
-<option value="silver">silver</option>
-<option value="teal">teal</option>
-<option value="white">white</option>
-<option value="yellow">yellow</option>
-</select>
-</p>
-
-<p>
-    <canvas id="canvas" width="640" height="480"/>
-</p>
-
-<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
-<script src="/socket.io/socket.io.js"></script>
-
-<script>
-var socket = io.connect(window.location.hostname);
-
-var Point = function(x,y) {
-    this.x = x;
-    this.y = y;
-    this.alpha = 1;
-};
-
-var Worm = function(length,width,color) {
-    this.color = color;
-    this.width = width;
-    this.points = new Array(length);
-    this.add = function(point) {
-        this.points.push(point);
-        this.points.shift();
-    };
-    this.fade = function() {
-        var i;
-        var points = this.points;
-        for (i=0; i<points.length; i++) {
-            points[i].alpha *= 0.85;
-        }
-    }
-    this.draw = function(cb) {
-        var i;
-        var points = this.points;
-        for (i=0; i<points.length; i++) {
-            if (points[i])
-                cb(points[i],width,color);
-        }
-    }
-};
-
-var Scene = function() {
-    this.me = new Worm(20,5);
-    this.others = new Array();
-    this.fade = function() {
-        this.me.fade();
-        for ( i in this.others ) {
-            var he = this.others[i];
-            he.fade();
-        }
-    };
-    this.moveme = function(x,y) {
-        var p = new Point(x,y);
-        this.me.add(p);
-    };
-    this.movehim = function(color,x,y) {
-        var p = new Point(x,y);
-        if (!this.others[color])
-            this.others[color] = new Worm(20,10,color);
-        this.others[color].add(p);
-    };
-    this.draw = function(canvas) {
-        var context = canvas.getContext('2d');
-        context.clearRect(0,0,canvas.width,canvas.height);
-        this.me.draw( function(p,size,color) {
-            arc(context,p.x,p.y,size,color,p.alpha);
+<html>
+<head>
+    <title>websocket-relay demo</title>
+    <style>
+        #canvas { border-style: dotted; }
+    </style>
+    <script src="/jam/require.js"></script>
+    <script>
+        requirejs(['app/main'], function(app) {
+            app.init();
         });
-        for ( i in this.others ) {
-            var he = this.others[i];
-            he.draw( function(p,size,color) {
-                arc(context,p.x,p.y,size,color,p.alpha);
-            });
-        }
-    };
-    function arc(context,centerX,centerY,radius,color,alpha) {
-        context.globalAlpha = alpha;
-        context.beginPath();
-        context.arc(centerX, centerY, radius||10, 0, 2 * Math.PI, false);
-        if (color) {
-            context.fillStyle = color;
-            context.fill();
-        }
-        context.lineWidth = 2;
-        context.strokeStyle = '#003300';
-        context.stroke();
-    };
-};
+    </script>
+</head>
+<body>
+    <p>
+        <select id="color" type="dropdown">
+            <option value="">--select color--</option>
+            <option value="aqua">aqua</option>
+            <option value="black">black</option>
+            <option value="blue">blue</option>
+            <option value="fuchsia">fuchsia</option>
+            <option value="gray">gray</option>
+            <option value="green">green</option>
+            <option value="lime">lime</option>
+            <option value="maroon">maroon</option>
+            <option value="navy">navy</option>
+            <option value="olive">olive</option>
+            <option value="orange">orange</option>
+            <option value="purple">purple</option>
+            <option value="red">red</option>
+            <option value="silver">silver</option>
+            <option value="teal">teal</option>
+            <option value="white">white</option>
+            <option value="yellow">yellow</option>
+        </select>
+    </p>
 
-var findPos = function(obj) {
-    var curleft = 0, curtop = 0;
-    if (obj.offsetParent) {
-        do {
-            curleft += obj.offsetLeft;
-            curtop += obj.offsetTop;
-        } while (obj = obj.offsetParent);
-        return { x: curleft, y: curtop };
-    }
-    return undefined;
-};
+    <p>
+        <canvas id="canvas" width="640" height="480"/>
+    </p>
+</body>
+</html>
 
-var scene = new Scene();
-var canvas = $('#canvas')[0];
-setInterval( function() {
-    scene.draw(canvas);
-}, 1);
-/*
-setInterval( function() {
-    scene.fade();
-}, 100);
-*/
-
-$('#canvas').mousemove( function(e) {
-    var pos = findPos(this);
-    var x = e.pageX - pos.x;
-    var y = e.pageY - pos.y;
-    var color = $('#color').val();
-    scene.moveme(x,y);
-    if (!color) return;
-    socket.emit('send', {
-        color: color,
-        x: x,
-        y: y
-    });
-});
-
-socket.on('message', function (data) {
-    var x = data.x;
-    var y = data.y;
-    var color = data.color;
-    scene.movehim(color,x,y);
-});
-
-$('#subscribe').click(function() {
-    var ch = $('#receive-channel').val();
-    socket.emit('subscribe', ch);
-});
-
-</script>
