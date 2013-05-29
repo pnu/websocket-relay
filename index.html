@@ -2,7 +2,9 @@
 <head>
     <title>websocket-relay demo</title>
     <style>
-        #canvas { border-style: dotted; }
+        #header { height: 10%; }
+        #svg svg { border-style: dotted; width: 100%; height: 80%; }
+        #footer { height: 10%; }
     </style>
     <script src="/jam/require.js"></script>
     <script>
@@ -10,7 +12,7 @@
     </script>
 </head>
 <body>
-    <p>
+    <div id="header">
         <select id="color" type="dropdown">
             <option value="">--select color--</option>
             <option value="aqua">aqua</option>
@@ -31,13 +33,9 @@
             <option value="white">white</option>
             <option value="yellow">yellow</option>
         </select>
-    </p>
-
-    <div id="svg"></div>
-
-    <p>
-        <canvas id="canvas" width="640" height="480"/>
-    </p>
+    </div>
+    <div id="svg"/>
+    <div id="footer"/>
 </body>
 </html>
 

@@ -1,10 +1,14 @@
 define( 'app/lib/Point', [
 ], function() {
 
-return function(x,y) {
-    this.x = x;
-    this.y = y;
-    this.alpha = 1;
+return function(raphael,x,y,size,color) {
+    this.circle = raphael.circle(x,y,size);
+    this.circle.attr("fill",color);
+    this.circle.attr("stroke","black");
+    $(this.circle.node).css({'vector-effect':'non-scaling-stroke'});
+    this.remove = function() {
+        this.circle.remove();
+    };
 };
 
 });
