@@ -10,6 +10,16 @@ if ( process.env.FORCE_XHR ) {
     });
 }
 
+io.configure('production', function(){
+  io.enable('browser client etag');
+  io.set('log level', 1);
+  io.set('transports', [ 'websocket', 'flashsocket', 'htmlfile', 'xhr-polling', 'jsonp-polling' ]);
+});
+
+io.configure('development', function(){
+  io.set('transports', ['websocket']);
+});
+
 app.use('/assets',express.static(__dirname+'/assets'));
 app.use('/jam',express.static(__dirname+'/jam'));
 app.use('/app',express.static(__dirname+'/app'));
