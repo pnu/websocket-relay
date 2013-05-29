@@ -9,10 +9,17 @@ start: function() {
     var socket = io.connect(window.location.hostname);
     var paper = new Paper('svg');
     var scene = new Scene(paper);
+    var p, color, p_dirty = false;
 
     $(paper.node).mousemove( function(e) {
-        var p = paper.pointerInverse(e.clientX,e.clientY);
-        var color = $('#color').val();
+        p = paper.pointerInverse(e.clientX,e.clientY);
+        color = $('#color').val();
+        p_dirty = true;
+    });
+
+    setInterval( function() {
+        if (!p_dirty) return;
+        p_dirty = false;
         scene.moveme(p.x,p.y);
         if (!color) return;
         socket.emit('send', {
@@ -20,7 +27,7 @@ start: function() {
             x: p.x,
             y: p.y
         });
-    });
+    }, 1000/100 );
 
     socket.on('message', function (data) {
         var x = data.x;
