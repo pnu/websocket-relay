@@ -6,9 +6,7 @@
     </style>
     <script src="/jam/require.js"></script>
     <script>
-        requirejs(['app/main'], function(app) {
-            app.init();
-        });
+        require(['app/init'], function(app) { app.init() });
     </script>
 </head>
 <body>
@@ -34,6 +32,8 @@
             <option value="yellow">yellow</option>
         </select>
     </p>
+
+    <div id="svg"></div>
 
     <p>
         <canvas id="canvas" width="640" height="480"/>
