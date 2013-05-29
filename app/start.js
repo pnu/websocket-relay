@@ -6,28 +6,24 @@ define('app/start', [
 ], function(Scene,Paper,$,io) { return {
 
 start: function() {
+    var sres = 10000;
     var socket = io.connect(window.location.hostname);
     var paper = new Paper('svg');
     var scene = new Scene(paper);
-    var p, color, p_dirty = false;
+    var p, color;
 
     $(paper.node).mousemove( function(e) {
-        p = paper.pointerInverse(e.clientX,e.clientY);
+        var point = paper.pointerInverse(e.clientX,e.clientY);
+        p = { x: Math.round(point.x*sres)/sres, y: Math.round(point.y*sres)/sres };
         color = $('#color').val();
-        p_dirty = true;
-    });
-
-    setInterval( function() {
-        if (!p_dirty) return;
-        p_dirty = false;
         scene.moveme(p.x,p.y);
-        if (!color) return;
-        socket.emit('send', {
-            color: color,
-            x: p.x,
-            y: p.y
-        });
-    }, 1000/100 );
+        if (color)
+            socket.emit('send', {
+                color: color,
+                x: p.x,
+                y: p.y
+            });
+    });
 
     socket.on('message', function (data) {
         var x = data.x;

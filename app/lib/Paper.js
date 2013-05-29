@@ -15,8 +15,7 @@ return function(container) {
         var point = this.node.createSVGPoint();
         var matrix = this.node.getScreenCTM().inverse();
         point.x = x; point.y = y;
-        p = point.matrixTransform(matrix);
-        return { x: p.x, y: p.y };
+        return point.matrixTransform(matrix);
     };
 };
 
