@@ -8,6 +8,15 @@ return function(length) {
         var rm = this.points.shift();
         if (rm) rm.remove();
     };
+    this.getpathstr = function() {
+        var points = this.points;
+        var pathstr = "";
+        for( i in points ) {
+            var cmd = (pathstr == "") ? "M" : "L";
+            pathstr = pathstr + cmd + points[i].x + "," + points[i].y;
+        }
+        return pathstr;
+    }
 };
 
 });
