@@ -1,14 +1,18 @@
 define( 'app/lib/Worm', [
 ], function() {
 
-return function(length) {
+var Worm = function(length) {
     this.points = new Array(length);
-    this.move = function(point) {
-        this.points.push(point);
-        var rm = this.points.shift();
+};
+
+Worm.prototype = {
+    move: function(point) {
+        var points = this.points;
+        points.push(point);
+        var rm = points.shift();
         if (rm) rm.remove();
-    };
-    this.getpathstr = function() {
+    },
+    getpathstr: function() {
         var points = this.points;
         var pathstr = "";
         for( i in points ) {
@@ -18,5 +22,7 @@ return function(length) {
         return pathstr;
     }
 };
+
+return Worm;
 
 });
